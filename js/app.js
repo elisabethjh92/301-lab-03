@@ -27,9 +27,14 @@ Image.prototype.render = function() {
   imageClone.attr('class', this.keyword);
 };
 
-Image.readJson = () => {
-  $.get('../data/page-1.json', 'json')
+Image.readJson = (file) => {
+  // emptying allImages to prepare for new images
+  Image.allImages = [];
+  // empties keyword array to prepare for new keywords
+  keywords = [];
+  $.get(file, 'json')
     .then(data => {
+      console.log('data:', data);
       data.forEach(item => {
         Image.allImages.push(new Image(item));
         if (!keywords.includes(item.keyword)) {
@@ -42,10 +47,12 @@ Image.readJson = () => {
 };
 
 Image.loadImages = () => {
+  $('#photo-template').siblings().remove();
   Image.allImages.forEach(image => image.render());
 };
 
 Image.appendKeywords = () => {
+  $('option').slice(2).remove();
   keywords.forEach(key => {
     let $option = $(`<option class="${key}">${key}</option>`);
     $('select').append($option);
@@ -67,4 +74,19 @@ $(() => {
   });
 });
 
-$(() => Image.readJson());
+$(() => {
+  $('#page-nav button').on('click', (e) => {
+    console.log('this:', e.target);
+    // if (this.type === 'button') {
+      if (e.target.value === 'one') {
+        console.log('clicked button one', e.target.value);
+        Image.readJson('../data/page-1.json');
+      } else {
+        console.log('clicked button two');
+        Image.readJson('../data/page-2.json');
+      }
+    // }
+  })
+})
+
+$(() => Image.readJson('../data/page-1.json'));
